@@ -19,7 +19,12 @@ function cli(input) {
     let args = input.split(/ +/);
     switch (args[1]) {
       case 'commit':
-        head.commit();
+        if (args[2] == '-m' && args.length >= 3) {
+          let message = args[3];
+          head.commit(message.replace(/^['"]|['"]$/g, ''));
+        } else {
+          head.commit();
+        }
         break;
       case 'branch':
         branch = args[2];
@@ -38,5 +43,8 @@ function cli(input) {
         let mergeBranch = args[2];
         branches[mergeBranch].merge(branches[branch]);
         break;
+      default:
+        return;
     }
+    $('#cli-txt').val('');
 }
