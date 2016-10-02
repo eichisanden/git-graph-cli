@@ -1,6 +1,6 @@
-'use strict';
-
 $(() => {
+  'use strict';
+
   let $cliTxt = $(".cli-txt");
   $cliTxt.focus();
 
@@ -9,13 +9,12 @@ $(() => {
       cli($cliTxt.val());
     }
   });
-});
 
-let head = new GitGraph();
-let branches = {};
-let branch;
+  let head = new GitGraph();
+  let branches = {};
+  let branch;
 
-function cli(input) {
+  function cli(input) {
     let args = input.split(/ +/);
     switch (args[1]) {
       case 'commit':
@@ -47,4 +46,5 @@ function cli(input) {
         return;
     }
     $('#cli-txt').val('');
-}
+  }
+});
