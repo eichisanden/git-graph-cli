@@ -23,7 +23,7 @@ $(() => {
         break;
       case 'branch':
         if (args.length == 2) {
-          let response;
+          let response = '';
           Object.keys(branches).forEach((b) => {
             response = `${response}<div>${b}</div>`;
           });
