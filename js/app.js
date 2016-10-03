@@ -27,7 +27,7 @@ $(() => {
           Object.keys(branches).forEach((b) => {
             response = `${response}<div>${b}</div>`;
           });
-          $('#cli-response').html(response || 'git-graph-cli: no branch exists');
+          $('#cli-response').html(response || 'git-graph-cli: No branch exists');
           return;
         } else {
           branches[args[2]] = head.branch(args[2]);
@@ -40,7 +40,7 @@ $(() => {
           $('#branch-name').text(branch);
         } else {
           if (branches[args[2]] == undefined) {
-            alert(`branch: ${args[2]} is not exist`);
+            $('#cli-response').html(`git-graph-cli: Branch: ${args[2]} is not exist`);
             return;
           }
           branch = args[2];
