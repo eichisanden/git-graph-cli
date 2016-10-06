@@ -29,7 +29,7 @@ $(() => {
           return;
         }
 
-        if (args[2] == '-m' && args.length >= 3) {
+        if (args[2] === '-m' && args.length >= 3) {
           const message = args[3];
           // commit with message without qutote charater.
           gitGraph.commit(message.replace(/^['"]|['"]$/g, ''));
@@ -40,26 +40,44 @@ $(() => {
         break;
 
       case 'branch':
-        // show branch list
-        if (args.length == 2) {
+        if (args.length === 2) {
+          // show branch list
           let response = '';
           Object.keys(branches).forEach((b) => {
-            if (b == checkoutBranch) {
+            if (b === checkoutBranch) {
               response = `${response}<div>*&nbsp;${b}</div>`;
             } else {
               response = `${response}<div>&nbsp;&nbsp;${b}</div>`;
             }
           });
           $cliResponse.html(response || 'git-graph-cli: there is no branch.');
-        // make new branch
-        } else {
-          const newBranchName = args[2];
-          branches[newBranchName] = gitGraph.branch(newBranchName);
+        } else if (args.length == 3) {
+            // make new branch
+            const branchName = args[2];
+            branches[branchName] = gitGraph.branch(branchName);
+        } else if (args.length == 4) {
+          if (args[2] === '-d' || args[2] === '-D') {
+            if (checkoutBranch === args[3]) {
+              $cliResponse.html(`git-graph-cli: Cant't delete check outing branch.`);
+              return;
+            }
+            // delete branch
+            const branchName = args[3];
+            if (branchName in branches) {
+              branches[branchName].delete();
+              delete branches[branchName];
+            } else {
+              $cliResponse.html(`git-graph-cli: Branch:${branchName} not exits.`);
+            }
+          } else {
+              $cliResponse.html(`git-graph-cli: Invalid option.`);
+              return;
+          }
         }
         break;
 
       case 'checkout':
-        if (args[2] == '-b' && args.length >= 3) {
+        if (args[2] === '-b' && args.length >= 3) {
           const newBranchName = args[3];
           // Already exist branch in branch list
           if (newBranchName in branches) {
@@ -100,7 +118,7 @@ $(() => {
 
   // return key event.
   $cliTxt.keypress((event) => {
-    if (event.which == 13) {
+    if (event.which === 13) {
       cli($cliTxt.val());
     }
   });
