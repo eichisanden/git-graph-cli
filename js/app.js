@@ -1,10 +1,17 @@
 $(() => {
   'use strict';
-  const gitGraph = new GitGraph();
+  let gitGraph = new GitGraph({
+      template: $('#template').val(),
+      reverseArrow: false,
+      orientation: $('#orientation').val(),
+      mode: $('#mode').val(),
+      author: $('#author').val()
+  });
   const branches = {};
   let checkoutBranch;
   const $cliResponse = $('#cli-response');
   const $branchName = $('#branch-name');
+  const $chagenButton = $('#change-button');
 
   function cli(input) {
     $cliResponse.text('');
@@ -28,7 +35,7 @@ $(() => {
           gitGraph.commit(message.replace(/^['"]|['"]$/g, ''));
         } else {
           // commit without message.
-          gitGraph.commit();
+          gitGraph.commit(' ');
         }
         break;
 
@@ -98,4 +105,14 @@ $(() => {
     }
   });
 
+  // change settings
+  $chagenButton.click(() => {
+    gitGraph = new GitGraph({
+      template: $('#template').val(),
+      reverseArrow: false,
+      orientation: $('#orientation').val(),
+      mode: $('#mode').val(),
+      author: $('#author').val()
+    });;
+  });
 });
