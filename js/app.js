@@ -71,7 +71,7 @@ $(() => {
             return;
           }
           checkoutBranch = branchName;
-          gitGraph.HEAD = branches[branchName];
+          branches[branchName].checkout();
           $branchName.text(checkoutBranch);
         }
         break;
