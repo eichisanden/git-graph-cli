@@ -1,66 +1,97 @@
 $(() => {
   'use strict';
-  let head = new GitGraph();
-  let branches = {};
-  let branch;
+  const gitGraph = new GitGraph();
+  const branches = {};
+  let checkoutBranch;
+  const $cliResponse = $('#cli-response');
+  const $branchName = $('#branch-name');
 
   function cli(input) {
-    $('#cli-response').text('');
-    let args = input.split(/ +/);
+    $cliResponse.text('');
+    const args = input.split(/ +/);
+
+    if (args.length <= 1 || args[0] != 'git') {
+      $cliResponse.html("git-graph-cli: invalid command. See 'help'.");
+      return;
+    }
+
     switch (args[1]) {
       case 'commit':
-        if (branch == undefined) {
-          console.log('no branch!!');
+        if (checkoutBranch == undefined) {
+          $cliResponse.html('git-graph-cli: no branch checkout.');
           return;
         }
 
         if (args[2] == '-m' && args.length >= 3) {
-          let message = args[3];
-          head.commit(message.replace(/^['"]|['"]$/g, ''));
+          const message = args[3];
+          // commit with message without qutote charater.
+          gitGraph.commit(message.replace(/^['"]|['"]$/g, ''));
         } else {
-          head.commit();
+          // commit without message.
+          gitGraph.commit();
         }
         break;
+
       case 'branch':
+        // show branch list
         if (args.length == 2) {
           let response = '';
           Object.keys(branches).forEach((b) => {
-            response = `${response}<div>${b}</div>`;
+            if (b == checkoutBranch) {
+              response = `${response}<div>*&nbsp;${b}</div>`;
+            } else {
+              response = `${response}<div>&nbsp;&nbsp;${b}</div>`;
+            }
           });
-          $('#cli-response').html(response || 'git-graph-cli: No branch exists');
-          return;
+          $cliResponse.html(response || 'git-graph-cli: there is no branch.');
+        // make new branch
         } else {
-          branches[args[2]] = head.branch(args[2]);
+          const newBranchName = args[2];
+          branches[newBranchName] = gitGraph.branch(newBranchName);
         }
         break;
+
       case 'checkout':
         if (args[2] == '-b' && args.length >= 3) {
-          branches[args[3]] = head.branch(args[3]);
-          branch = args[3];
-          $('#branch-name').text(branch);
+          const newBranchName = args[3];
+          // Already exist branch in branch list
+          if (newBranchName in branches) {
+            $cliResponse.html(`git-graph-cli: Branch: ${newBranchName} is already exist.`);
+            return;
+          // Add branch and checkout.
+          } else {
+            branches[newBranchName] = gitGraph.branch(newBranchName);
+            checkoutBranch = newBranchName;
+            $branchName.text(checkoutBranch);
+          }
         } else {
-          if (branches[args[2]] == undefined) {
-            $('#cli-response').html(`git-graph-cli: Branch: ${args[2]} is not exist`);
+          const branchName = args[2];
+          if (!(branchName in branches)) {
+            $cliResponse.html(`git-graph-cli: Branch: ${branchName} is not exist.`);
             return;
           }
-          branch = args[2];
-          $('#branch-name').text(branch);
+          checkoutBranch = branchName;
+          gitGraph.HEAD = branches[branchName];
+          $branchName.text(checkoutBranch);
         }
         break;
+
       case 'merge':
-        let mergeBranch = args[2];
-        branches[mergeBranch].merge(branches[branch]);
+        const mergeBranch = args[2];
+        branches[mergeBranch].merge(branches[checkoutBranch]);
         break;
+
       default:
-        $('#cli-response').text(`git-graph-cli: '${args[1]}' is not valid option. See 'help'`);
+        $cliResponse.text(`git-graph-cli: '${args[1]}' is not valid option. See 'help'.`);
         return;
     }
     $('#cli-txt').val('');
   }
 
-  let $cliTxt = $('.cli-txt');
+  const $cliTxt = $('.cli-txt');
   $cliTxt.focus();
 
+  // return key event.
   $cliTxt.keypress((event) => {
     if (event.which == 13) {
       cli($cliTxt.val());
