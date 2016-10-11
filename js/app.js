@@ -7,14 +7,15 @@ $(() => {
       mode: $('#mode').val(),
       author: $('#author').val()
   });
-  const branches = {};
+  let branches = {};
+  let history = [];
   let checkoutBranch;
   const $cliResponse = $('#cli-response');
   const $branchName = $('#branch-name');
   const $chagenButton = $('#change-button');
 
   function cli(input) {
-    out('');
+      out('');
     const args = input.split(/ +/);
 
     if (args.length <= 1 || args[0] != 'git') {
@@ -110,6 +111,7 @@ $(() => {
         out(`git-graph-cli: '${args[1]}' is not valid option. See 'help'.`);
         return;
     }
+    save(input);
     $('#cli-txt').val('');
   }
 
@@ -125,17 +127,37 @@ $(() => {
 
   // change settings
   $chagenButton.click(() => {
+    // new GitGraph Object
     gitGraph = new GitGraph({
       template: $('#template').val(),
       reverseArrow: false,
       orientation: $('#orientation').val(),
       mode: $('#mode').val(),
       author: $('#author').val()
-    });;
+    });
+
+    // clear canvas
+    gitGraph.render();
+
+    // clear branches
+    branches = {};
+    checkoutBranch = undefined;
+    const historyCopy = history.slice(0);
+    history = [];
+
+    // restore canvas
+    for (let command of historyCopy) {
+      cli(command);
+    }
   });
 
   // output message.
   function out(message) {
     $cliResponse.text(message);
+  }
+
+  // save command history
+  function save(command) {
+    history.push(command);
   }
 });
