@@ -10,6 +10,7 @@ $(() => {
   const $template = $('#template');
   const $orientation = $('#orientation');
   const $mode = $('#mode');
+  const $reverseArrow = $('#reverseArrow');
   const $author = $('#author');
   const $cliTxt = $('.cli-txt');
 
@@ -27,11 +28,12 @@ $(() => {
   $template.change(changeSetting);
   $orientation.change(changeSetting);
   $mode.change(changeSetting);
+  $reverseArrow.change(changeSetting);
   function changeSetting() {
     // new GitGraph Object
     gitGraph = new GitGraph({
       template: $template.val(),
-      reverseArrow: false,
+      reverseArrow: $reverseArrow.prop('checked'),
       orientation: $orientation.val(),
       mode: $mode.val(),
       author: $author.val()
@@ -53,7 +55,7 @@ $(() => {
   }
 
   function cli(input) {
-      out('');
+    out('');
     const args = input.split(/ +/);
 
     if (args.length <= 1 || args[0] != 'git') {
@@ -61,16 +63,17 @@ $(() => {
       return;
     }
 
-    switch (args[1]) {
+    const option1 = args[1];
+    switch (option1) {
       case 'commit':
-        if (checkoutBranch == undefined) {
+        if (checkoutBranch === undefined) {
           out('git-graph-cli: no branch checkout.');
           return;
         }
 
         if (args[2] === '-m' && args.length >= 3) {
           const message = args[3];
-          // commit with message without qutote charater.
+          // commit with message without quoted charater.
           gitGraph.commit(message.replace(/^['"]|['"]$/g, ''));
         } else {
           // commit without message.
@@ -90,18 +93,20 @@ $(() => {
             }
           });
           out(response || 'git-graph-cli: there is no branch.');
+          $cliTxt.val('');
+          return;
         } else if (args.length == 3) {
             // make new branch
             const branchName = args[2];
             branches[branchName] = gitGraph.branch(branchName);
         } else if (args.length == 4) {
+          const branchName = args[3];
           if (args[2] === '-d' || args[2] === '-D') {
-            if (checkoutBranch === args[3]) {
+            if (checkoutBranch === branchName) {
               out(`git-graph-cli: Cant't delete check outing branch.`);
               return;
             }
             // delete branch
-            const branchName = args[3];
             if (branchName in branches) {
               branches[branchName].delete();
               delete branches[branchName];
@@ -142,20 +147,24 @@ $(() => {
 
       case 'merge':
         const mergeBranch = args[2];
+        if (!(mergeBranch in branches)) {
+          out(`git-graph-cli: Branch: ${mergeBranch} is not exist.`);
+          return;
+        }
         branches[mergeBranch].merge(branches[checkoutBranch]);
         break;
 
       default:
-        out(`git-graph-cli: '${args[1]}' is not valid option. See 'help'.`);
+        out(`git-graph-cli: '${option1}' is not valid option. See 'help'.`);
         return;
     }
     save(input);
-    $('#cli-txt').val('');
+    $cliTxt.val('');
   }
 
   // output message.
   function out(message) {
-    $cliResponse.text(message);
+    $cliResponse.html(message);
   }
 
   // save command history
