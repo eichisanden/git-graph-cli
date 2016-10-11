@@ -16,10 +16,6 @@ $(() => {
   $cliTxt.focus();
   changeSetting();
 
-  $template.change(changeSetting);
-  $orientation.change(changeSetting);
-  $mode.change(changeSetting);
-
   // capture "return" key event.
   $cliTxt.keypress((event) => {
     if (event.which === 13) {
@@ -28,6 +24,9 @@ $(() => {
   });
 
   // change settings
+  $template.change(changeSetting);
+  $orientation.change(changeSetting);
+  $mode.change(changeSetting);
   function changeSetting() {
     // new GitGraph Object
     gitGraph = new GitGraph({
