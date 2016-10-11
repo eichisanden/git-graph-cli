@@ -23,3 +23,11 @@ body{
   width: 80%;
   border: 0;
 }
+
+.command-bk {
+  padding: 5px;
+}
+
+.command-item {
+  margin-right: 5px;
+}
