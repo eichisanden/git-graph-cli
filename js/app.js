@@ -14,18 +14,18 @@ $(() => {
   const $chagenButton = $('#change-button');
 
   function cli(input) {
-    $cliResponse.text('');
+    out('');
     const args = input.split(/ +/);
 
     if (args.length <= 1 || args[0] != 'git') {
-      $cliResponse.html("git-graph-cli: invalid command. See 'help'.");
+      out("git-graph-cli: invalid command. See 'help'.");
       return;
     }
 
     switch (args[1]) {
       case 'commit':
         if (checkoutBranch == undefined) {
-          $cliResponse.html('git-graph-cli: no branch checkout.');
+          out('git-graph-cli: no branch checkout.');
           return;
         }
 
@@ -50,7 +50,7 @@ $(() => {
               response = `${response}<div>&nbsp;&nbsp;${b}</div>`;
             }
           });
-          $cliResponse.html(response || 'git-graph-cli: there is no branch.');
+          out(response || 'git-graph-cli: there is no branch.');
         } else if (args.length == 3) {
             // make new branch
             const branchName = args[2];
@@ -58,7 +58,7 @@ $(() => {
         } else if (args.length == 4) {
           if (args[2] === '-d' || args[2] === '-D') {
             if (checkoutBranch === args[3]) {
-              $cliResponse.html(`git-graph-cli: Cant't delete check outing branch.`);
+              out(`git-graph-cli: Cant't delete check outing branch.`);
               return;
             }
             // delete branch
@@ -67,10 +67,10 @@ $(() => {
               branches[branchName].delete();
               delete branches[branchName];
             } else {
-              $cliResponse.html(`git-graph-cli: Branch:${branchName} not exits.`);
+              out(`git-graph-cli: Branch:${branchName} not exits.`);
             }
           } else {
-              $cliResponse.html(`git-graph-cli: Invalid option.`);
+              out(`git-graph-cli: Invalid option.`);
               return;
           }
         }
@@ -81,7 +81,7 @@ $(() => {
           const newBranchName = args[3];
           // Already exist branch in branch list
           if (newBranchName in branches) {
-            $cliResponse.html(`git-graph-cli: Branch: ${newBranchName} is already exist.`);
+            out(`git-graph-cli: Branch: ${newBranchName} is already exist.`);
             return;
           // Add branch and checkout.
           } else {
@@ -92,7 +92,7 @@ $(() => {
         } else {
           const branchName = args[2];
           if (!(branchName in branches)) {
-            $cliResponse.html(`git-graph-cli: Branch: ${branchName} is not exist.`);
+            out(`git-graph-cli: Branch: ${branchName} is not exist.`);
             return;
           }
           checkoutBranch = branchName;
@@ -107,7 +107,7 @@ $(() => {
         break;
 
       default:
-        $cliResponse.text(`git-graph-cli: '${args[1]}' is not valid option. See 'help'.`);
+        out(`git-graph-cli: '${args[1]}' is not valid option. See 'help'.`);
         return;
     }
     $('#cli-txt').val('');
@@ -133,4 +133,9 @@ $(() => {
       author: $('#author').val()
     });;
   });
+
+  // output message.
+  function out(message) {
+    $cliResponse.text(message);
+  }
 });
