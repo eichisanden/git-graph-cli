@@ -3,6 +3,7 @@ $(() => {
   let gitGraph;
   let branches = {};
   let history = [];
+  let histCounter = 0;
   let checkoutBranch;
   const $cliResponse = $('#cli-response');
   const $branchName = $('#branch-name');
@@ -17,11 +18,25 @@ $(() => {
   $cliTxt.focus();
   changeSetting();
 
-  // capture "return" key event.
-  $cliTxt.keypress((event) => {
-    if (event.which === 13) {
-      cli($cliTxt.val());
+  $cliTxt.keyup((event) => {
+    switch (event.which) {
+      case 13: // return key
+        cli($cliTxt.val());
+        break;
+      case 38: // up key
+        console.log(`histCounter=${histCounter} history.length=${history.length}`);
+        if (histCounter > 0 && histCounter <= history.length) {
+          $cliTxt.val(history[--histCounter]);
+        }
+        break;
+      case 40: // down key
+        console.log(`histCounter=${histCounter} history.length=${history.length}`);
+        if (histCounter < history.length) {
+          $cliTxt.val(history[++histCounter]);
+        }
+        break;
     }
+    
   });
 
   // change settings
@@ -170,5 +185,6 @@ $(() => {
   // save command history
   function save(command) {
     history.push(command);
+    histCounter = history.length;
   }
 });
