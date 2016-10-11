@@ -1,18 +1,57 @@
 $(() => {
   'use strict';
-  let gitGraph = new GitGraph({
-      template: $('#template').val(),
-      reverseArrow: false,
-      orientation: $('#orientation').val(),
-      mode: $('#mode').val(),
-      author: $('#author').val()
-  });
+  let gitGraph;
   let branches = {};
   let history = [];
   let checkoutBranch;
   const $cliResponse = $('#cli-response');
   const $branchName = $('#branch-name');
   const $chagenButton = $('#change-button');
+  const $template = $('#template');
+  const $orientation = $('#orientation');
+  const $mode = $('#mode');
+  const $author = $('#author');
+  const $cliTxt = $('.cli-txt');
+
+  $cliTxt.focus();
+  changeSetting();
+
+  $template.change(changeSetting);
+  $orientation.change(changeSetting);
+  $mode.change(changeSetting);
+
+  // capture "return" key event.
+  $cliTxt.keypress((event) => {
+    if (event.which === 13) {
+      cli($cliTxt.val());
+    }
+  });
+
+  // change settings
+  function changeSetting() {
+    // new GitGraph Object
+    gitGraph = new GitGraph({
+      template: $template.val(),
+      reverseArrow: false,
+      orientation: $orientation.val(),
+      mode: $mode.val(),
+      author: $author.val()
+    });
+
+    // clear canvas
+    gitGraph.render();
+
+    // clear branches
+    branches = {};
+    checkoutBranch = undefined;
+    const historyCopy = history.slice(0);
+    history = [];
+
+    // restore canvas
+    for (let command of historyCopy) {
+      cli(command);
+    }
+  }
 
   function cli(input) {
       out('');
@@ -114,42 +153,6 @@ $(() => {
     save(input);
     $('#cli-txt').val('');
   }
-
-  const $cliTxt = $('.cli-txt');
-  $cliTxt.focus();
-
-  // return key event.
-  $cliTxt.keypress((event) => {
-    if (event.which === 13) {
-      cli($cliTxt.val());
-    }
-  });
-
-  // change settings
-  $chagenButton.click(() => {
-    // new GitGraph Object
-    gitGraph = new GitGraph({
-      template: $('#template').val(),
-      reverseArrow: false,
-      orientation: $('#orientation').val(),
-      mode: $('#mode').val(),
-      author: $('#author').val()
-    });
-
-    // clear canvas
-    gitGraph.render();
-
-    // clear branches
-    branches = {};
-    checkoutBranch = undefined;
-    const historyCopy = history.slice(0);
-    history = [];
-
-    // restore canvas
-    for (let command of historyCopy) {
-      cli(command);
-    }
-  });
 
   // output message.
   function out(message) {
