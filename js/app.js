@@ -7,7 +7,7 @@ $(() => {
   let checkoutBranch;
   const $cliResponse = $('#cli-response');
   const $branchName = $('#branch-name');
-  const $chagenButton = $('#change-button');
+  const $saveButton = $('#save-button');
   const $template = $('#template');
   const $orientation = $('#orientation');
   const $mode = $('#mode');
@@ -37,6 +37,14 @@ $(() => {
         break;
     }
     
+  });
+
+  // save image
+  $saveButton.click(() => {
+    const canvas = document.getElementById('gitGraph');
+    canvas.toBlob((blob) => {
+      saveAs(blob, 'gitGraph.png');
+    });
   });
 
   // change settings

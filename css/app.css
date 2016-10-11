@@ -31,3 +31,17 @@ body{
 .command-item {
   margin-right: 5px;
 }
+
+.save-button {
+  background-color: blue;
+  border-style: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 11pt;
+  font-weight: bold;
+  padding: 5px 10px;
+}
+
+.save-button:hover {
+  background-color: darkblue;
+}
